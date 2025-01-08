@@ -3,22 +3,16 @@
 import { useState } from 'react'
 
 const script = `
- const products = [];
-    const cleanUpText = (text) => text.trim().replace(/\s+/g, ' ').replace(/\n/g, '');
-    const productsNodes = document.querySelector('.cart__products').querySelectorAll('.productCard__content');
-    productsNodes.forEach((productNode) => {
-      const product = {
-        name: cleanUpText(productNode.querySelector('.product--details__summary').querySelector('p').textContent),
-        type: cleanUpText(productNode.querySelector('.product--details__title').textContent),
-        packaging: cleanUpText(productNode.querySelector('.product--details__packaging').textContent),
-        price: cleanUpText(productNode.querySelector('.product--price').textContent),
-        quantity: cleanUpText(productNode.querySelector('.addToCart-button__quantity').textContent),
-        promo: cleanUpText(productNode.querySelector('.product--footer__promoContainer').textContent),
-        image: productNode.querySelector('.product--details__image').src,
-      };
-      products.push(product);
-    });
-    console.log(products);
+(function(d, script) {
+  script = d.createElement('script');
+  script.type = 'text/javascript';
+  script.async = true;
+  script.onload = function(){
+  getProducts();
+  };
+  script.src = 'https://intermarche-cart-scrapper.vercel.app/scrapper.js';
+  d.getElementsByTagName('head')[0].appendChild(script);
+}(document));
 `;
 
 type Product = {
@@ -35,6 +29,7 @@ export default function Home() {
   const [jsonInput, setJsonInput] = useState('')
   const [parsedArray, setParsedArray] = useState<Product[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setJsonInput(e.target.value)
@@ -65,23 +60,40 @@ export default function Home() {
         <h1 className="text-4xl font-bold mb-4">Partage Panier Intermarché</h1>
         <div className="mb-4">
           <textarea
-            className="w-full h-40 p-2 border rounded bg-black"
+            className="w-full h-32 p-2 border rounded bg-black"
             value={jsonInput}
             onChange={handleInputChange}
             placeholder="JSON Data..."
           />
         </div>
         <button
-           className="border border-purple-400 hover:bg-purlpe-700 text-white font-bold py-2 px-4 rounded mr-2"
+          className="border border-purple-400 hover:bg-purple-400 text-white font-bold py-2 px-4 rounded mr-2"
           onClick={() => copyScriptToClipboard()}
         >
           Copy script
         </button>
         <button
-          className="bg-purple-400 hover:bg-purlpe-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-purple-400 hover:bg-purlpe-700 text-white font-bold py-2 px-4 rounded mr-16"
           onClick={handleParseJson}
         >
           Parse JSON
+        </button>
+        <input
+          className='border border-purple-400 rounded p-2 bg-transparent mr-2'
+          type="text"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <a
+          className="bg-purple-400 hover:bg-purlpe-700 text-white font-bold py-2.5 px-4 rounded mr-2"
+          href={`mailto:${email}?subject=Liste de course du ${new Date()}&body=https://intermarche-cart-scrapper.vercel.app/ \n ${parsedArray && JSON.stringify(parsedArray)}`}>Envoyer
+        </a>
+        <button
+          className="border border-purple-400 hover:bg-purple-400 text-white font-bold py-2 px-4 rounded mr-2"
+          onClick={() => copyScriptToClipboard()}
+        >
+          Copy mail
         </button>
         {error && <p className="text-red-500 mt-2">{error}</p>}
         {parsedArray && (
