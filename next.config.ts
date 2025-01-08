@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "https://www.intermarche.com/, https://intermarche-cart-scrapper.vercel.app/, localhost:3000",
+            // value: "https://www.intermarche.com/, https://intermarche-cart-scrapper.vercel.app/, localhost:3000",
+            value: "*",
           },
           {
             key: "Access-Control-Allow-Methods",
