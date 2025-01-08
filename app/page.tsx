@@ -280,7 +280,7 @@ export default function Home() {
       setError(null)
     } catch (err) {
       setParsedArray(null)
-      setError('Invalid JSON array input')
+      setError('Invalid JSON array input:' + err)
     }
   }
 
