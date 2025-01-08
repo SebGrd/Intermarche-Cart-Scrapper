@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { log } from 'console';
+import { useEffect, useState } from 'react'
 
 const script = `
 (function(d, script) {
@@ -29,7 +30,22 @@ export default function Home() {
   const [jsonInput, setJsonInput] = useState('')
   const [parsedArray, setParsedArray] = useState<Product[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
+  const [storedCart, setStoredCart] = useState<Product[] | null>(null)
+
+  const postNewCart = async (cart: Product[]) => {
+    console.log('cart', cart)
+    const res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cart)
+    })
+    if (!res.ok) {
+      console.log('Error saving cart', res)
+    }
+  };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setJsonInput(e.target.value)
@@ -44,6 +60,7 @@ export default function Home() {
       }
       setParsedArray(parsed)
       setError(null)
+      postNewCart(parsed)
     } catch (err) {
       setParsedArray(null)
       setError('Invalid JSON array input:' + err)
@@ -53,6 +70,20 @@ export default function Home() {
   const copyScriptToClipboard = () => {
     navigator.clipboard.writeText(script)
   }
+
+  useEffect(() => {
+    fetch('/api/cart')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          console.log('error', data.error)
+          return
+        }
+        console.log('data', data)
+        setStoredCart(data)
+      })
+  }, [])
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -78,23 +109,7 @@ export default function Home() {
         >
           Parse JSON
         </button>
-        <input
-          className='border border-purple-400 rounded p-2 bg-transparent mr-2'
-          type="text"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <a
-          className="bg-purple-400 hover:bg-purlpe-700 text-white font-bold py-2.5 px-4 rounded mr-2"
-          href={`mailto:${email}?subject=Liste de course du ${new Date()}&body=https://intermarche-cart-scrapper.vercel.app/ \n ${parsedArray && JSON.stringify(parsedArray)}`}>Envoyer
-        </a>
-        <button
-          className="border border-purple-400 hover:bg-purple-400 text-white font-bold py-2 px-4 rounded mr-2"
-          onClick={() => copyScriptToClipboard()}
-        >
-          Copy mail
-        </button>
+        {JSON.stringify(storedCart)}
         {error && <p className="text-red-500 mt-2">{error}</p>}
         {parsedArray && (
           <div className="mt-4">
