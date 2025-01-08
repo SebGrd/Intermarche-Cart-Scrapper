@@ -262,7 +262,7 @@ type Product = {
 
 export default function Home() {
   const [jsonInput, setJsonInput] = useState('')
-  const [parsedArray, setParsedArray] = useState<Product[] | null>(defaultValue)
+  const [parsedArray, setParsedArray] = useState<Product[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
