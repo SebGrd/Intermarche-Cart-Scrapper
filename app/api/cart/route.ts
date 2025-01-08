@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   return NextResponse.json({ success: true }, { status: 201 })
 }
 
-export async function GET(req: NextApiRequest) {
+export async function GET() {
   const filePath = path.join(process.cwd(), '/app/api/cart/cart.json');
    const cart = fs.readFileSync(filePath, 'utf-8')
    return NextResponse.json(JSON.parse(cart))
